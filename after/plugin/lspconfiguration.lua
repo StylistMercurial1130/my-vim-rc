@@ -68,8 +68,41 @@ cmp.setup {
 }
 
 
-local languages = { "tsserver", "csharp_ls" }
+local languages = { "tsserver", "angularls", "html","rust_analyzer"}
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+	local enabled_features = {
+		"documentHighlights",
+		"documentSymbols",
+		"foldingRanges",
+		"selectionRanges",
+		-- "semanticHighlighting",
+		"formatting",
+		"codeActions",
+	}
+
+require('lspconfig')['ruby_ls'].setup {
+	default_config = {
+		cmd = { "bundle", "exec", "ruby-lsp" },
+		filetypes = { "ruby" },
+		root_dir =  require('lspconfig').util.root_pattern("Gemfile", ".git"),
+		init_options = {
+			enabledFeatures = enabled_features,
+		},
+		settings = {},
+	},
+	commands = {
+		FormatRuby = {
+			function()
+				vim.lsp.buf.format({
+					name = "ruby_lsp",
+					async = true,
+				})
+			end,
+			description = "Format using ruby-lsp",
+		},
+	},
+}
 
 require('lspconfig')['lua_ls'].setup {
 	on_init = function(client)
@@ -102,9 +135,24 @@ require('lspconfig')['lua_ls'].setup {
 	end
 }
 
+
+require('lspconfig')['ocamllsp'].setup({
+	cmd = { "ocamllsp" },
+	filetypes = { "ocaml", "ocaml.menhir", "ocaml.interface", "ocaml.ocamllex", "reason", "dune" },
+	root_dir = require('lspconfig').util.root_pattern("*.opam", "esy.json", "package.json", ".git", "dune-project", "dune-workspace"),
+	capabilities = capabilities
+})
+
+require("lspconfig")["omnisharp"].setup({
+	enable_roslyn_analysers = true,
+	enable_import_completion = true,
+	organize_imports_on_format = true,
+	filetypes = { 'cs', 'vb', 'csproj', 'sln', 'slnx', 'props' },
+})
+
 for _,language in pairs(languages) do
 	require('lspconfig')[language].setup {
-		capabilitie = capabilities
+		capabilities = capabilities
 	}
 end
 
@@ -125,7 +173,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
     vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
     vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
-    vim.keymap.set('n', '<leader>wl', function()
+    vim.keymap.set('n', '<leader>lw', function()
       print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
     end, opts)
     vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)

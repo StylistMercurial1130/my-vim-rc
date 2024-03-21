@@ -5,6 +5,7 @@ function startup()
 	set.relativenumber = true
 	set.tabstop = 4	
 	set.shiftwidth = 4
+	vim.cmd("noh");
 	vim_global.mapleader = " "
 	local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 	if not vim.loop.fs_stat(lazypath) then
